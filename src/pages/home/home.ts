@@ -1,5 +1,5 @@
 import { Component, ViewChild } from "@angular/core";
-import { NavController } from "ionic-angular";
+import { NavController, ToastController } from "ionic-angular";
 import { Camera, CameraOptions } from "@ionic-native/camera";
 import { AngularCropperjsComponent } from "angular-cropperjs";
 
@@ -15,7 +15,7 @@ export class HomePage {
   minImageHeight: 300;
 
   @ViewChild("angularCropper") public angularCropper: AngularCropperjsComponent;
-  constructor(private camera: Camera, public navCtrl: NavController) {
+  constructor(private camera: Camera, public navCtrl: NavController, private toastCtrl: ToastController) {
     this.cropperOptions = {
       dragMode: "move",
       aspectRatio: 1,
@@ -56,12 +56,21 @@ export class HomePage {
       }
     );
   }
+  presentToast(message) {
+    let toast = this.toastCtrl.create({
+      message: message,
+      duration: 3000,
+      position: 'top'
+    });
+    toast.present();
+  }
+
   checkImageSize(){
     let img = new Image();
     img.src = this.myImage;
     img.addEventListener("load", () => {
       if(img.height <= 300 || img.width <= 300){
-        console.log("Please select a image with dimensions at least 300x300")
+        this.presentToast("Image should be at atlease 300x300 in size")
         this.myImage = null;
       }
     });
@@ -83,7 +92,7 @@ export class HomePage {
       this.angularCropper.cropper.getCroppedCanvas().height < 300
     ) {
       this.zoomOut();
-      console.log("min allowed size is 300x300");
+      this.presentToast("Minimum allowed size is 300x300")
     }
   }
   zoomOut() {
